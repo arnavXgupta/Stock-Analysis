@@ -30,10 +30,10 @@
 
 ## Screenshots
 
-![App Screenshot](tradelog-snippet.png)
-![App Screenshot](backtest.png)
-![App Screenshot](candlestick-BB.png)
+![App Screenshot](./images/tradelog-snippet.png)
+![App Screenshot](./images/backtest.png)
+![App Screenshot](./images/candlestick-BB.png)
 
 #### The data I considered for this project
 
-![App Screenshot](image.png)
+![App Screenshot](./images/image.png)

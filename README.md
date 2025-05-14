@@ -34,3 +34,6 @@
 ![App Screenshot](backtest.png)
 ![App Screenshot](candlestick-BB.png)
 
+#### The data I considered for this project
+
+![App Screenshot](image.png)

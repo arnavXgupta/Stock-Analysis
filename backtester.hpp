@@ -6,7 +6,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include "decision_logic_rectified.hpp"  // for Decision and Signal
+#include "decision_logic.hpp"  // for Decision and Signal
 
 class Backtester {
 public:

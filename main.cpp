@@ -1,11 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <chrono>
 #include "fetcher.hpp"
-#include "indicators_rectified.hpp"
-#include "decision_logic_rectified.hpp"
+#include "indicators.hpp"
+#include "decision_logic.hpp"
 #include "backtester.hpp"
 #include "export_decisions.hpp"
+// #include <cuda_runtime.h>
 
 int main()
 {
@@ -34,6 +36,86 @@ int main()
         std::cout << "Date range: " << data.dates.back() << " to " << data.dates.front() << std::endl;
     }
 
+    // === Individual Timing for Each Indicator ===
+    auto start = std::chrono::high_resolution_clock::now();
+    auto sma = computeSMA(data.close, 20);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "SMA Calculation Time: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    auto ema = computeEMA(data.close, 20);
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "EMA Calculation Time: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    auto rsi = computeRSI(data.close, 14);
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "RSI Calculation Time: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    auto bb = computeBollingerBands(data.close, 20);
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "Bollinger Bands Calculation Time: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    auto macd = computeMACD(data.close);
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "MACD Calculation Time: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    auto stoch = computeStochasticOscillator(data.close, data.high, data.low);
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "Stochastic Oscillator Calculation Time: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    auto atr = computeATR(data.high, data.low, data.close, 14);
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "ATR Calculation Time: " << std::chrono::duration<double, std::milli>(end - start).count() << " ms\n";
+
+    // Start GPU timing
+//     float gpu_time_ms = 0;
+//     cudaEvent_t start, stop;
+//     cudaEventCreate(&start);
+//     cudaEventCreate(&stop);
+//     cudaEventRecord(start);
+
+//     // GPU version of indicators (if use_gpu is true)
+// #ifdef __CUDACC__
+//     auto sma_gpu = computeSMA_GPU(data.close, 20);
+//     auto ema_gpu = computeEMA_GPU(data.close, 20);
+//     auto rsi_gpu = computeRSI_GPU(data.close, 14);
+//     auto bb_gpu = computeBollingerBands_GPU(data.close, 20);
+//     auto macd_gpu = computeMACD_GPU(data.close);
+//     auto stoch_gpu = computeStochasticOscillator_GPU(data.close, data.high, data.low);
+//     auto atr_gpu = computeATR_GPU(data.high, data.low, data.close, 14);
+// #endif
+
+//     // Stop GPU timing
+//     cudaEventRecord(stop);
+//     cudaEventSynchronize(stop);
+//     cudaEventElapsedTime(&gpu_time_ms, start, stop);
+//     std::cout << "\nTotal GPU calculation time: " << gpu_time_ms << " ms" << std::endl;
+
+    exportIndicatorsToCSV(
+        "indicators.csv",
+        data.dates,
+        data.close,
+        sma,
+        ema,
+        rsi,
+        bb,
+        macd,
+        stoch,
+        atr,
+        20, // SMA period
+        20, // EMA period
+        14, // RSI period
+        20, // BB period
+        26, // MACD slow
+        14, // ATR period
+        14  // Stochastic %K period
+    );
+
     // Generate decisions
     std::vector<Decision> decisions = generateDecisions(
         data.dates,
@@ -41,14 +123,13 @@ int main()
         data.high,
         data.low,
         data.volume,
-        use_gpu
-    );
+        use_gpu);
 
-    //save decision to csv
+    // save decision to csv
     exportDecisionCSV("signals.csv", decisions, data.close);
 
     Backtester bt(decisions, data.close, data.dates);
-    bt.run();    // Simulate trading
+    bt.run(); // Simulate trading
     bt.exportBacktestCSV("backtest.csv");
     bt.report(); // Print summary
 

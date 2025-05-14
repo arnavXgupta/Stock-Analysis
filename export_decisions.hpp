@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "decision_logic_rectified.hpp"  // for Decision and Signal
+#include "decision_logic.hpp"  // for Decision and Signal
 
 void exportDecisionCSV(const std::string& filename, const std::vector<Decision>& decisions, const std::vector<float>& closePrices) {
     std::ofstream file(filename);

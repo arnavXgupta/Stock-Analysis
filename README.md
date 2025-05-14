@@ -32,4 +32,5 @@
 
 ![App Screenshot](tradelog-snippet.png)
 ![App Screenshot](backtest.png)
+![App Screenshot](candlestick-BB.png)
 
